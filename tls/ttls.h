@@ -560,7 +560,7 @@ typedef struct ttls_context {
 	char			*hostname;
 } TlsCtx;
 
-typedef int ttls_send_cb_t(TlsCtx *tls, struct sg_table *sgt, bool close);
+typedef int ttls_send_cb_t(TlsCtx *tls, struct sg_table *sgt);
 typedef int ttls_sni_cb_t(TlsCtx *tls, const unsigned char *data, size_t len);
 
 bool ttls_xfrm_ready(TlsCtx *tls);
