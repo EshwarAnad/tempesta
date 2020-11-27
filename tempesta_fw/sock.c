@@ -634,6 +634,20 @@ adjudge_to_death:
  * This function is for internal Sync Sockets use only. It's called under the
  * socket lock taken by the kernel, and in the context of the socket that is
  * being closed.
+ */
+void
+ss_close_force(struct sock *sk)
+{
+	ss_do_close(sk);
+	SS_CALL_GUARD_EXIT(connection_drop, sk);
+	sock_put(sk); /* paired with ss_do_close() */
+}
+EXPORT_SYMBOL(ss_close_force);
+
+/**
+ * This function is for internal Sync Sockets use only. It's called under the
+ * socket lock taken by the kernel, and in the context of the socket that is
+ * being closed.
  *
  * This is unintentional connection closing, usually due to some data errors.
  * This is not socket error, but still must lead to connection failovering
@@ -642,9 +656,7 @@ adjudge_to_death:
 static void
 ss_linkerror(struct sock *sk)
 {
-	ss_do_close(sk);
-	SS_CALL_GUARD_EXIT(connection_drop, sk);
-	sock_put(sk);	/* paired with ss_do_close() */
+	ss_close_force(sk);
 }
 
 /**
